@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     """Настройки API"""
 
     project_name: str = Field(title='Название проекта')
+    base_url: str = Field(default='http://127.0.0.1')
     api_v1_prefix: str = Field(title='Префикс первой версии API', default='/api/v1')
 
     # region БД

@@ -14,7 +14,6 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,
     )
     container = Container()
-    container.init_resources()
     container.wire(modules=settings.container_wiring_modules)
     fastapi_app.container = container
 

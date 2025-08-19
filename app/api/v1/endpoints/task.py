@@ -34,7 +34,7 @@ async def create_task(
     return task_schema
 
 
-@router.get('/{task_id}', status_code=status.HTTP_200_OK)
+@router.get('/{task_id}/', status_code=status.HTTP_200_OK)
 @inject
 async def get_task(
         task_id: uuid.UUID,
@@ -69,7 +69,7 @@ async def get_tasks_list(
 
 
 @router.put(
-    '/{task_id}',
+    '/{task_id}/',
     status_code=status.HTTP_200_OK,
 )
 @inject
@@ -90,7 +90,7 @@ async def update_task(
     return task_schema
 
 
-@router.delete('/{task_id}', status_code=status.HTTP_200_OK)
+@router.delete('/{task_id}/', status_code=status.HTTP_200_OK)
 @inject
 async def delete_task(
         task_id: uuid.UUID,
