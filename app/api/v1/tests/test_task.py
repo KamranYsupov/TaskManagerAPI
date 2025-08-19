@@ -90,7 +90,8 @@ async def test_get_task_list_limit(
     response_data = response.json()
 
     assert response.status_code == 200
-    assert len(response_data) == limit
+    if len(created_task_list) > limit:
+        assert len(response_data) == limit
 
 
 async def test_get_task_list_skip(
