@@ -10,7 +10,7 @@ from app.core.container import Container
 
 def create_app() -> FastAPI:
     fastapi_app = FastAPI(
-        title=settings.service_name,
+        title=settings.project_name,
         default_response_class=ORJSONResponse,
     )
     container = Container()

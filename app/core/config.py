@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Настройки API"""
 
+    project_name: str = Field(title='Название проекта')
     api_v1_prefix: str = Field(title='Префикс первой версии API', default='/api/v1')
 
     # region БД
