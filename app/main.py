@@ -18,7 +18,8 @@ def create_app() -> FastAPI:
     container.wire(modules=settings.container_wiring_modules)
     fastapi_app.container = container
 
-    fastapi_app.include_router(routers.api_router, prefix=settings.api_v1_prefix)
+    api_router = routers.get_api_router()
+    fastapi_app.include_router(api_router, prefix=settings.api_v1_prefix)
 
     return fastapi_app
 

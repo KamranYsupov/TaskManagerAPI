@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     # endregion
 
     container_wiring_modules: list = [
-        'app.api.v1.endpoints'
+        'app.api.v1.endpoints.task'
     ]
 
     @property

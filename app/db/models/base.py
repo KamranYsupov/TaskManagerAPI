@@ -34,12 +34,29 @@ class Base(DeclarativeBase):
             serialized_data[field] = data.get(field)
 
         if not exclude_fields:
-            return serialized_data
+            return self.get_serialized(
+                schema_class,
+                serialized_data,
+                model_dump,
+            )
 
         for field in exclude_fields:
             serialized_data.pop(field)
 
+        return self.get_serialized(
+            schema_class,
+            serialized_data,
+            model_dump,
+        )
+
+    @staticmethod
+    def get_serialized(
+            schema_class,
+            serialized_data: Dict,
+            model_dump: bool = False,
+    ):
         if model_dump:
             return serialized_data
 
         return schema_class(**serialized_data)
+
