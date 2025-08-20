@@ -55,6 +55,17 @@ async def task_data() -> Dict[str, Any]:
 
 
 @pytest.fixture(scope='function')
+async def updated_task_data() -> Dict[str, Any]:
+    task_data = {
+        'name': 'Updated Task',
+        'description': 'An updated task for testing',
+        'status': TaskStatus.IN_PROGRESS
+    }
+    task = CreateTaskSchema(**task_data)
+    return task.model_dump()
+
+
+@pytest.fixture(scope='function')
 async def created_task(async_client, task_data) -> Dict[str, Any]:
     response = await async_client.post('/tasks/', json=task_data)
     return response.json()

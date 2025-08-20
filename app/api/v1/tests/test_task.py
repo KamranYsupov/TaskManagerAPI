@@ -1,3 +1,4 @@
+import uuid
 from uuid import uuid4
 from typing import Dict, List, Any
 
@@ -26,6 +27,23 @@ async def test_create_task(
     assert task['status'] == task_data['status']
 
 
+async def test_create_task_not_unique_name(
+        async_client: AsyncClient,
+        task_data: dict,
+        created_task: dict,
+):
+    """
+    Тест для проверки создания задачи с неуникальным названием
+    """
+    response = await async_client.post(
+        '/tasks/',
+        json=task_data
+    )
+    task = response.json()
+
+    assert response.status_code == 400
+
+
 async def test_get_task(
         async_client: AsyncClient,
         created_task: dict,
@@ -43,7 +61,7 @@ async def test_get_task(
 async def test_get_non_existent_task(async_client: AsyncClient):
     """
     Тест для проверки получения ошибки 404
-    при запросе получения несуществуюшей задачи
+    при запросе получения несуществующей задачи
     """
     non_existent_task_id = uuid4()
     response = await async_client.get(
@@ -131,24 +149,61 @@ async def test_get_task_list_skip(
 async def test_update_task(
         async_client: AsyncClient,
         created_task: dict,
+        updated_task_data: dict,
 ):
     """Тест для проверки обновления задачи"""
     task_id = created_task['id']
-    updated_data = {
-        'name': 'Updated Task',
-        'description': 'An updated task for testing',
-        'status': TaskStatus.IN_PROGRESS
-    }
 
     response = await async_client.put(
         f'/tasks/{task_id}/',
-        json=updated_data
+        json=updated_task_data
     )
     response_data = response.json()
     assert response.status_code == 200
-    assert response_data['name'] == updated_data['name']
-    assert response_data['description'] == updated_data['description']
-    assert response_data['status'] == updated_data['status']
+    assert response_data['name'] == updated_task_data['name']
+    assert response_data['description'] == updated_task_data['description']
+    assert response_data['status'] == updated_task_data['status']
+
+
+async def test_update_task_not_unique_name(
+        async_client: AsyncClient,
+        created_task: dict,
+        updated_task_data: dict,
+):
+    """
+    Тест для проверки обновления задачи
+    с передачей неуникального названия
+    """
+    task_id = created_task['id']
+    updated_task_data['name'] = created_task['name']
+
+    response = await async_client.put(
+        f'/tasks/{task_id}/',
+        json=updated_task_data
+    )
+    response_data = response.json()
+    assert response.status_code == 200
+    assert response_data['name'] == updated_task_data['name']
+    assert response_data['description'] == updated_task_data['description']
+    assert response_data['status'] == updated_task_data['status']
+
+
+async def test_update_non_existent_task(
+        async_client: AsyncClient,
+        created_task: dict,
+        updated_task_data: dict,
+):
+    """
+    Тест для проверки получения ошибки 404
+    при запросе обновления несуществующей задачи
+    """
+    non_existent_task_id = uuid.uuid4()
+
+    response = await async_client.put(
+        f'/tasks/{non_existent_task_id}/',
+        json=updated_task_data
+    )
+    assert response.status_code == 404
 
 
 async def test_delete_task(
@@ -168,3 +223,17 @@ async def test_delete_task(
     assert response.status_code == 404
 
 
+async def test_delete_non_existent_task(
+        async_client: AsyncClient,
+        created_task: dict,
+):
+    """
+    Тест для проверки получения ошибки 404
+    при запросе удаления несуществующей задачи
+    """
+    non_existent_task_id = uuid.uuid4()
+
+    response = await async_client.delete(
+        f'/tasks/{non_existent_task_id}/'
+    )
+    assert response.status_code == 404
