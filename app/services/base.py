@@ -1,3 +1,4 @@
+import uuid
 from uuid import UUID
 from typing import (
     List,
@@ -5,7 +6,7 @@ from typing import (
     Sequence,
     TypeVar,
     Type,
-    Optional, Generic,
+    Optional, Generic, Union,
 )
 
 from fastapi import HTTPException
@@ -38,7 +39,10 @@ class CRUDBaseService(Generic[RepositoryType, ]):
 
     async def update(self, *, obj_id: UUID, obj_in) -> ModelType:
         await self.get_object_or_404(id=obj_id)
-        insert_data = await self.validate_object_insertion(obj_in)
+        insert_data = await self.validate_object_insertion(
+            obj_in=obj_in,
+            obj_to_update_id=obj_id,
+        )
         return await self._repository.update(
             obj_id=obj_id,
             insert_data=insert_data,
@@ -65,7 +69,11 @@ class CRUDBaseService(Generic[RepositoryType, ]):
     async def exists(self, *args, **kwargs) -> Optional[ModelType]:
         return await self._repository.exists(*args, **kwargs)
 
-    async def validate_object_insertion(self, obj_in) -> dict:
+    async def validate_object_insertion(
+            self,
+            obj_in,
+            obj_to_update_id: Optional[Union[uuid.UUID, str]] = None
+    ) -> dict:
         insert_data = obj_in if isinstance(obj_in, dict) else obj_in.model_dump()
         if not self.unique_fields:
             return insert_data
@@ -79,7 +87,7 @@ class CRUDBaseService(Generic[RepositoryType, ]):
         ]
 
         existing_obj = await self._repository.exists(*conditions)
-        if existing_obj:
+        if existing_obj and existing_obj.id != obj_to_update_id:
             formatted_fields_string = ' or '.join(self.unique_fields).capitalize()
             exception_detail = f'{formatted_fields_string} is already taken'
 
